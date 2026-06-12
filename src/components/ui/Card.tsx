@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { getRelativeTime } from "@/utils/customData";
 import { MessageCircle, Heart, User } from "lucide-react";
 import { IComment } from "@/models/post.model";
@@ -26,28 +27,32 @@ export default function Card({
   useEffect(() => {
     const visitorId = getVisitorId();
     if (likes && visitorId) {
-      setIsLiked(likes.includes(visitorId)); 
+      setIsLiked(likes.includes(visitorId));
     }
   }, [likes]);
 
   return (
-    <div className="space-y-3 border-b border-dashed py-4 hover:bg-foreground/5 transition-colors px-2">
+    <div className="space-y-3 border-b border-dashed hover:border-background transition-all duration-300 py-4 hover:bg-foreground/5 px-2">
       <div className="flex items-center gap-3">
         <div className="border border-foreground/20 rounded-full p-2 bg-foreground/5 shadow-sm">
           <User size={20} className="opacity-70" />
         </div>
         <div>
           <p className="text-sm font-semibold tracking-tight">{author}</p>
-          <p className="text-xs opacity-50 font-light">{getRelativeTime(createdAt)}</p>
+          <p className="text-xs opacity-50 font-light">
+            {getRelativeTime(createdAt)}
+          </p>
         </div>
       </div>
-      
+
       <div className="py-1">
-        <p className="leading-relaxed text-[15px] opacity-90 whitespace-pre-wrap">{content}</p>
+        <p className="leading-relaxed text-[15px] opacity-90 whitespace-pre-wrap">
+          {content}
+        </p>
       </div>
 
       <div className="flex items-center gap-6 pt-1">
-        <button 
+        <button
           onClick={onComment}
           className="flex items-center gap-2 text-xs opacity-60 hover:opacity-100 hover:text-blue-500 transition-all group"
         >
@@ -57,13 +62,17 @@ export default function Card({
           <span className="font-medium">{comments.length} Comments</span>
         </button>
 
-        <button 
-          onClick={onLike} 
+        <button
+          onClick={onLike}
           className={`flex items-center gap-2 text-xs transition-all group ${
-            isLiked ? "text-red-500 opacity-100" : "opacity-60 hover:opacity-100 hover:text-red-500"
+            isLiked
+              ? "text-red-500 opacity-100"
+              : "opacity-60 hover:opacity-100 hover:text-red-500"
           }`}
         >
-          <div className={`p-1.5 rounded-full ${isLiked ? "bg-red-500/10" : "group-hover:bg-red-500/10"}`}>
+          <div
+            className={`p-1.5 rounded-full ${isLiked ? "bg-red-500/10" : "group-hover:bg-red-500/10"}`}
+          >
             <Heart size={16} fill={isLiked ? "currentColor" : "none"} />
           </div>
           <span className="font-medium">{likes.length} Likes</span>
