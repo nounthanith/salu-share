@@ -119,7 +119,12 @@ export default function GetPost() {
   };
 
   if (error)
-    return <div className="p-10 text-center text-red-500">Error: {error}</div>;
+    return (
+      <div>
+        <h1>Something went wrong</h1>
+        <p className="text-xs">Error: {error}</p>
+      </div>
+    );
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-6">
@@ -203,7 +208,7 @@ export default function GetPost() {
                   .map((comment: any, idx: number) => (
                     <div
                       key={idx}
-                      className="bg-foreground/5 p-3 rounded-xl border border-foreground/5 animate-in fade-in slide-in-from-bottom-2 duration-300"
+                      className="bg-foreground/5 p-3 mb-1 rounded-xl border border-foreground/5 animate-in fade-in slide-in-from-bottom-2 duration-300"
                     >
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-xs font-bold">
