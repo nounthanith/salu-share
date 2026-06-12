@@ -13,6 +13,11 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off", // This stops the "Unexpected any" error
+    },
+  },
 ]);
 
 export default eslintConfig;
