@@ -8,7 +8,7 @@ export default function ClientLayout({
   return (
     <div>
       <Navbar />
-      <main className="container mx-auto px-4 py-4">{children}</main>
+      <main className="container mx-auto px-4 py-16">{children}</main>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import Card from "../ui/Card";
 import Dialog from "../ui/Dialog";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
-import { User, MessageCircle, Loader2 } from "lucide-react";
+import { User, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { getVisitorId } from "@/utils/fingerprint";
 import { getRelativeTime } from "@/utils/customData";
@@ -77,18 +77,35 @@ export default function GetPost() {
   const activePost =
     posts?.find((p) => p._id === selectedPost?._id) || selectedPost;
 
+  const toggleLike = (postId: string, visitorId: string) =>
+    setPosts((prev) =>
+      prev.map((p) =>
+        p._id === postId
+          ? {
+              ...p,
+              likes: p.likes.includes(visitorId)
+                ? p.likes.filter((id: string) => id !== visitorId)
+                : [...p.likes, visitorId],
+            }
+          : p,
+      ),
+    );
+
   const handleLike = async (postId: string) => {
+    const visitorId = getVisitorId();
+    if (!visitorId) return;
+
+    toggleLike(postId, visitorId);
+
     try {
-      const visitorId = getVisitorId();
       const res = await fetch(`/api/posts/${postId}/like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ visitorId }),
       });
-      if (res.ok) {
-        refreshSinglePost(postId);
-      }
+      if (!res.ok) toggleLike(postId, visitorId);
     } catch (err) {
+      toggleLike(postId, visitorId);
       console.error("Like failed:", err);
     }
   };
@@ -179,8 +196,29 @@ export default function GetPost() {
       </div>
 
       {loading && (
-        <div className="flex justify-center py-4">
-          <Loader2 className="animate-spin opacity-50" size={24} />
+        <div className="space-y-1">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="space-y-3 border border-border/50 rounded-xl py-4 px-4 animate-pulse"
+            >
+              <div className="flex items-center gap-3">
+                <div className="rounded-full p-2 bg-foreground/10 size-10" />
+                <div className="space-y-2">
+                  <div className="h-3 w-24 rounded bg-foreground/10" />
+                  <div className="h-2 w-16 rounded bg-foreground/10" />
+                </div>
+              </div>
+              <div className="py-1 space-y-2">
+                <div className="h-3 w-full rounded bg-foreground/10" />
+                <div className="h-3 w-3/4 rounded bg-foreground/10" />
+              </div>
+              <div className="flex items-center gap-6 pt-1">
+                <div className="h-4 w-20 rounded bg-foreground/10" />
+                <div className="h-4 w-16 rounded bg-foreground/10" />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

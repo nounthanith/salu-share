@@ -32,7 +32,7 @@ export default function Card({
   }, [likes]);
 
   return (
-    <div className="space-y-3 border-b border-dashed hover:border-background transition-all duration-300 py-4 hover:bg-foreground/5 px-2">
+    <div className="space-y-3 border border-border/50 rounded-sm py-4 px-4 transition-all duration-300 hover:border-border hover:shadow-lg hover:shadow-foreground/5 hover:-translate-y-0.5">
       <div className="flex items-center gap-3">
         <div className="border border-foreground/20 rounded-full p-2 bg-foreground/5 shadow-sm">
           <User size={20} className="opacity-70" />
