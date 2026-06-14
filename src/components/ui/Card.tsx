@@ -47,7 +47,21 @@ export default function Card({
 
       <div className="py-1">
         <p className="leading-relaxed text-[15px] opacity-90 whitespace-pre-wrap">
-          {content}
+          {content.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+            part.match(/^https?:\/\//) ? (
+              <a
+                key={i}
+                href={part}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline break-all"
+              >
+                {part}
+              </a>
+            ) : (
+              part
+            )
+          )}
         </p>
       </div>
 
