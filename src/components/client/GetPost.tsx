@@ -200,7 +200,7 @@ export default function GetPost() {
           {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
-              className="space-y-3 border border-border/50 rounded-xl py-4 px-4 animate-pulse"
+              className="space-y-3 border border-border/50 rounded-sm py-4 px-4 animate-pulse"
             >
               <div className="flex items-center gap-3">
                 <div className="rounded-full p-2 bg-foreground/10 size-10" />
