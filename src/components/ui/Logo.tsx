@@ -1,8 +1,10 @@
+"use client";
+
 export default function Logo() {
   return (
-    <div className="font-semibold">
+    <button className="font-semibold" onClick={() => window.location.reload()}>
       <span className="bg-foreground text-background rounded-sm p-0.5">Sa</span>
       <span>lu</span>
-    </div>
+    </button>
   );
 }

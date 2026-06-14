@@ -197,7 +197,7 @@ export default function GetPost() {
 
       {loading && (
         <div className="space-y-1">
-          {[1, 2, 3].map((i) => (
+          {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
               className="space-y-3 border border-border/50 rounded-xl py-4 px-4 animate-pulse"
