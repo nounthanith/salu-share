@@ -4,13 +4,11 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Card from "../ui/Card";
-import Dialog from "../ui/Dialog";
-import Input from "../ui/Input";
 import Button from "../ui/Button";
-import { User, MessageCircle } from "lucide-react";
+import CommentDialog from "./CommentDialog";
+import { User } from "lucide-react";
 import Link from "next/link";
 import { getVisitorId } from "@/utils/fingerprint";
-import { getRelativeTime } from "@/utils/customData";
 
 export default function GetPost() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -20,9 +18,6 @@ export default function GetPost() {
   const [error, setError] = useState("");
 
   const [selectedPost, setSelectedPost] = useState<any>(null);
-  const [commentText, setCommentText] = useState("");
-  const [commentAuthor, setCommentAuthor] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const observer = useRef<IntersectionObserver | null>(null);
   const lastPostElementRef = useCallback(
@@ -64,8 +59,6 @@ export default function GetPost() {
 
   const refreshSinglePost = async (postId: string) => {
     try {
-      // Fetch latest version of this specific post to update local state
-      // For now, we'll just refetch the current pages to keep it simple
       const res = await fetch(`/api/posts?page=1&limit=${posts.length}`);
       const data = await res.json();
       setPosts(data.posts || []);
@@ -73,9 +66,6 @@ export default function GetPost() {
       console.error("Update failed:", err);
     }
   };
-
-  const activePost =
-    posts?.find((p) => p._id === selectedPost?._id) || selectedPost;
 
   const toggleLike = (postId: string, visitorId: string) =>
     setPosts((prev) =>
@@ -110,28 +100,18 @@ export default function GetPost() {
     }
   };
 
-  const handleCommentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!commentText.trim() || !activePost) return;
-
-    setIsSubmitting(true);
-    try {
-      const res = await fetch(`/api/posts/${activePost._id}/comment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          content: commentText,
-          author: commentAuthor.trim() || "Anonymous",
-        }),
-      });
-      if (res.ok) {
-        setCommentText("");
-        await refreshSinglePost(activePost._id);
-      }
-    } catch (err) {
-      console.error("Comment failed:", err);
-    } finally {
-      setIsSubmitting(false);
+  const handleCommentSubmit = async (comment: string, author: string) => {
+    if (!selectedPost) return;
+    const res = await fetch(`/api/posts/${selectedPost._id}/comment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: comment,
+        author: author.trim() || "Anonymous",
+      }),
+    });
+    if (res.ok) {
+      await refreshSinglePost(selectedPost._id);
     }
   };
 
@@ -228,72 +208,12 @@ export default function GetPost() {
         </p>
       )}
 
-      {activePost && (
-        <Dialog
-          isOpen={!!selectedPost}
+      {selectedPost && (
+        <CommentDialog
+          post={selectedPost}
           onClose={() => setSelectedPost(null)}
-          title="Comments"
-        >
-          <div className="space-y-6">
-            <div className="max-h-[40vh] overflow-y-auto space-y-4 pr-2 custom-scrollbar flex flex-col-reverse">
-              {activePost.comments.length === 0 ? (
-                <p className="text-center opacity-40 py-4 text-sm italic">
-                  No comments yet. Be the first!
-                </p>
-              ) : (
-                [...activePost.comments]
-                  .reverse()
-                  .map((comment: any, idx: number) => (
-                    <div
-                      key={idx}
-                      className="bg-foreground/5 p-3 mb-1 rounded-xl border border-foreground/5 animate-in fade-in slide-in-from-bottom-2 duration-300"
-                    >
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs font-bold">
-                          {comment.author}
-                        </span>
-                        <span className="text-[10px] opacity-40">
-                          {getRelativeTime(comment.createdAt)}
-                        </span>
-                      </div>
-                      <p className="text-sm opacity-90">{comment.content}</p>
-                    </div>
-                  ))
-              )}
-            </div>
-
-            <form
-              onSubmit={handleCommentSubmit}
-              className="pt-4 border-t border-foreground/10 space-y-3"
-            >
-              <Input
-                placeholder="Your name (optional)"
-                value={commentAuthor}
-                onChange={(e) => setCommentAuthor(e.target.value)}
-                size={16}
-                className="text-xs py-1.5"
-              />
-              <div className="flex gap-2 items-end">
-                <div className="flex-1">
-                  <Input
-                    placeholder="Write a comment..."
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  size="sm"
-                  isLoading={isSubmitting}
-                  disabled={!commentText.trim()}
-                >
-                  <MessageCircle size={16} />
-                </Button>
-              </div>
-            </form>
-          </div>
-        </Dialog>
+          onSubmitComment={handleCommentSubmit}
+        />
       )}
     </div>
   );
