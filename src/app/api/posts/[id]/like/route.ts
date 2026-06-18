@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Post from "@/models/post.model";
 import { createHash } from "crypto";
+import { pusherServer } from "@/lib/pusher";
 
 export async function POST(
   request: NextRequest,
@@ -38,11 +39,13 @@ export async function POST(
       // Unlike (optional behavior, or just return error)
       post.likes = post.likes.filter((f) => f !== fingerprint);
       await post.save();
+      await pusherServer.trigger("posts", "post-updated", post);
       return NextResponse.json({ message: "Unliked", likesCount: post.likes.length });
     } else {
       // Like
       post.likes.push(fingerprint);
       await post.save();
+      await pusherServer.trigger("posts", "post-updated", post);
       return NextResponse.json({ message: "Liked", likesCount: post.likes.length });
     }
   } catch (error: any) {

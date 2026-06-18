@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Post from "@/models/post.model";
+import { pusherServer } from "@/lib/pusher";
 
 export async function GET(request: NextRequest) {
   try {
@@ -50,6 +51,8 @@ export async function POST(request: NextRequest) {
       content,
       author: author || "Anonymous",
     });
+
+    await pusherServer.trigger("posts", "new-post", newPost);
 
     return NextResponse.json(newPost, { status: 201 });
   } catch (error) {

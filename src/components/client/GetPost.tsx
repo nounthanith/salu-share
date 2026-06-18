@@ -9,6 +9,7 @@ import CommentDialog from "./CommentDialog";
 import { User } from "lucide-react";
 import Link from "next/link";
 import { getVisitorId } from "@/utils/fingerprint";
+import { useWebSocket } from "@/hooks/useWebSocket";
 
 export default function GetPost() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -18,6 +19,22 @@ export default function GetPost() {
   const [error, setError] = useState("");
 
   const [selectedPost, setSelectedPost] = useState<any>(null);
+
+  // Real-time updates for new posts
+  useWebSocket("posts", "new-post", (newPost) => {
+    setPosts((prev) => {
+      // Avoid duplicates
+      if (prev.some((p) => p._id === newPost._id)) return prev;
+      return [newPost, ...prev];
+    });
+  });
+
+  // Real-time updates for likes and comments
+  useWebSocket("posts", "post-updated", (updatedPost) => {
+    setPosts((prev) =>
+      prev.map((p) => (p._id === updatedPost._id ? updatedPost : p))
+    );
+  });
 
   const observer = useRef<IntersectionObserver | null>(null);
   const lastPostElementRef = useCallback(

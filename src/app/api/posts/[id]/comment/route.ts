@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Post from "@/models/post.model";
+import { pusherServer } from "@/lib/pusher";
 
 export async function POST(
   request: NextRequest,
@@ -28,6 +29,8 @@ export async function POST(
     });
 
     await post.save();
+
+    await pusherServer.trigger("posts", "post-updated", post);
 
     return NextResponse.json({ message: "Comment added", comments: post.comments });
   } catch (error: any) {
